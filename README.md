@@ -1,105 +1,105 @@
 # Naukri Jobs Feed
 
-Extract structured job listings from naukri.com — India's largest job portal with 100M+ registered users. Includes detail enrichment, salary data, AmbitionBox ratings, incremental monitoring, and compact output for AI-agent workflows.
+Extract structured data from [Naukri.com](https://Naukri.com) — job listings from Naukri.com with keyword search, filters, and optional detail enrichment
 
-Available on:
-- **Apify:** https://apify.com/blackfalcondata/naukri-jobs-feed
+**[Run on Apify →](https://apify.com/blackfalcondata/naukri-jobs-feed)**
 
-## Example request
-
-Run the actor via the Apify API:
-
-POST https://api.apify.com/v2/acts/blackfalcondata~naukri-jobs-feed/runs
-
-Example input:
-```json
-{
-  "keyword": "python developer",
-  "location": "Bangalore",
-  "maxResults": 50,
-  "fetchDetails": true
-}
-```
-
-## Example response
-```json
-{
-  "jobId": "180326019917",
-  "title": "Python Software Developer",
-  "companyName": "HCLTech",
-  "companyId": 4263814,
-  "experienceText": "6-10 Yrs",
-  "minimumExperience": 6,
-  "maximumExperience": 10,
-  "salary": "25-30 Lacs PA",
-  "salaryMin": 2500000,
-  "salaryMax": 3000000,
-  "salaryCurrency": "INR",
-  "location": "Hyderabad, Bengaluru",
-  "skills": ["GCP", "Google Api", "Python", "SQL", "Rest API"],
-  "createdDate": "2026-03-19T14:37:16.515Z",
-  "portalUrl": "https://www.naukri.com/job-listings-python-software-developer-hcltech-hyderabad-bengaluru-6-to-10-years-180326019917",
-  "industry": "IT Services & Consulting",
-  "ambitionBox": {
-    "url": "https://www.ambitionbox.com/reviews/hcl-technologies-reviews",
-    "rating": "3.4",
-    "reviewsCount": 45343
-  },
-  "description": "<p>Primary skills (Mandatory)...</p>",
-  "roleCategory": "IT & Information Security - Other",
-  "employmentType": "Full Time, Permanent",
-  "vacancy": 1,
-  "applyCount": 352,
-  "scrapedAt": "2026-03-20T20:35:00.000Z",
-  "searchKeyword": "python developer"
-}
-```
+---
 
 ## Key features
 
-- Keyword search with location, experience, and salary filters
-- Structured salary data: min, max, currency (INR)
-- AmbitionBox company ratings and review counts
-- Full job description and education requirements via detail enrichment
-- Direct job ID lookup (skip search, fetch specific jobs)
-- Incremental mode for scheduled monitoring (new/changed jobs only)
-- Compact output mode for AI-agent and MCP workflows
-- Description truncation for token budget control
-- Work-from-home / remote filter
-- Freshness filter (jobs posted within N days)
+📄 **Detail enrichment**
 
-## Filters
+Fetch full job descriptions, salary data, employer profiles, and contact information for each listing.
 
-- Keyword (job title or skill)
-- Location (city)
-- Minimum / maximum experience (years)
-- Salary range (lakhs per annum)
-- Work from home only
-- Posted within N days (freshness)
+🔄 **Incremental mode**
 
-## Pricing
+Only get new or changed listings since your last run. Content hash per listing — no duplicates, no re-processing.
 
-- $0.005 per run start
-- $0.002 per job listing
+⚡ **Compact output for AI agents**
+
+Core-fields-only mode optimized for MCP and AI agent workflows. Description truncation to control output size.
+
+---
 
 ## Use cases
 
-- Job market intelligence for Indian tech sector
-- Recruitment and staffing pipeline
-- Salary benchmarking across roles and locations
-- Sales intelligence and lead generation
-- Competitor hiring monitoring
-- Academic labour market research
+**Data pipeline automation**
+Integrate with your ETL pipeline to collect structured listings from Naukri.com on a schedule. Export to CSV, JSON, or directly to your database.
 
-## Documentation
+**Market research**
+Monitor listings, track trends, and analyze market dynamics with structured, deduplicated data from Naukri.com.
 
-Full documentation, input/output reference, and sample output:
-https://apify.com/blackfalcondata/naukri-jobs-feed
+**AI and LLM workflows**
+Use compact mode and description truncation to feed data into AI agents, MCP servers, and LLM pipelines without exceeding token budgets.
 
-## Related
+---
 
-- [StepStone Jobs API](https://github.com/BlackFalconData-org/stepstone-jobs-api) — search and extract job listings from 18 StepStone Group portals
-- [Arbeitsagentur Jobs Feed](https://github.com/BlackFalconData-org/arbeitsagentur-jobs-feed) — extract job listings from Germany's federal employment portal
-- [Indeed Jobs Feed](https://github.com/BlackFalconData-org/indeed-jobs-feed) — extract job listings from Indeed
-- [Glassdoor Jobs Feed](https://github.com/BlackFalconData-org/glassdoor-jobs-feed) — extract job listings from Glassdoor
-- [Company Jobs Tracker](https://github.com/BlackFalconData-org/company-jobs-tracker-api) — track new and removed job listings per company
+## Quick start
+
+```json
+{
+  "maxResults": 50
+}
+```
+
+---
+
+## Input parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `keyword` | string | — | Job search keyword (e.g. 'python developer', 'data analyst'). Not required if jobIds is provided. |
+| `jobIds` | array | — | Fetch specific jobs by their Naukri job IDs (skips keyword search). Each ID is fetched via the detail API. |
+| `location` | string | — | Filter by location (e.g. 'Bangalore', 'Mumbai', 'Delhi') |
+| `maxResults` | integer | `100` | Maximum number of jobs to return (0 = unlimited) |
+| `fetchDetails` | boolean | `false` | Fetch full job descriptions and additional fields via detail API (slower but richer data) |
+| `incremental` | boolean | `false` | Only return new or changed jobs since last run (state scoped per keyword+location) |
+| `compact` | boolean | `false` | Return only core fields (jobId, title, company, location, salary, experience, skills, createdDate, portalUrl, description). Ideal for AI agents and MCP workflows. |
+| `descriptionMaxLength` | integer | — | Truncate job descriptions to this many characters (0 or empty = no truncation) |
+| `experienceMin` | integer | — | Minimum years of experience filter |
+| `experienceMax` | integer | — | Maximum years of experience filter |
+| `salary` | enum | — | Salary range filter in lakhs per annum |
+| `workFromHome` | boolean | `false` | Filter for work-from-home / remote jobs only |
+| `freshness` | integer | — | Only show jobs posted within this many days (1, 3, 7, 15, or 30) |
+| `maxConcurrency` | integer | `3` | Maximum number of concurrent requests |
+| `maxRequestRetries` | integer | `3` | Maximum number of retries per request |
+| `proxyConfiguration` | object | — | Apify proxy configuration (not required — the API works without proxy) |
+
+---
+
+## FAQ
+
+<!-- WRITE: 4-6 Q&A pairs relevant to this product -->
+
+**Is it legal to scrape Naukri.com?**
+Web scraping of publicly available data is generally legal. This actor only accesses publicly visible information. Always check the target site's terms of service for your specific use case.
+
+**How does incremental mode work?**
+Each listing gets a content hash. On subsequent runs, only new or changed listings are emitted — saving time, compute, and storage.
+
+---
+
+## Known limitations
+
+<!-- WRITE: 4-6 honest limitations -->
+
+- <!-- WRITE: limitation 1 -->
+- <!-- WRITE: limitation 2 -->
+
+---
+
+## Related products by Black Falcon Data
+
+| Product | Description |
+|:--------|:------------|
+| [StepStone Jobs API](https://github.com/BlackFalconData-org/stepstone-jobs-api) | Job listings from 18 European portals |
+| [Company Jobs Tracker](https://github.com/BlackFalconData-org/company-jobs-tracker-api) | Track new/removed jobs per company |
+| [Indeed Jobs Feed](https://github.com/BlackFalconData-org/indeed-jobs-feed) | Indeed job listings with salary data |
+| [Glassdoor Jobs Feed](https://github.com/BlackFalconData-org/glassdoor-jobs-feed) | Glassdoor listings with company ratings |
+| [Arbeitsagentur Jobs Feed](https://github.com/BlackFalconData-org/arbeitsagentur-jobs-feed) | Germany's federal job portal (1M+ listings) |
+| [Bilbasen Scraper](https://github.com/BlackFalconData-org/bilbasen-scraper) | Denmark's largest car marketplace |
+
+---
+
+*Last updated: 2026 03*
